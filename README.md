@@ -1,3 +1,13 @@
+## Share quantitative image results as DICOM
+
+This is a development fork of [dcmqi](https://github.com/QIICR/dcmqi), a collection of C++ libraries and command-line tools for representing quantitative imaging results in DICOM. Upstream supports conversions involving segmentations, parametric maps, and structured measurement reports, helping research workflows exchange analysis results with software that understands these DICOM objects.
+
+**Merged contribution:** [PR #566](https://github.com/QIICR/dcmqi/pull/566) accepts macOS SDK names in `CMAKE_OSX_SYSROOT`.
+
+The [official manual](https://qiicr.gitbook.io/dcmqi-guide/) provides installation, usage, and conversion guidance. The original README below preserves the project's scientific references and acknowledgments. Use the [branch comparison](https://github.com/QIICR/dcmqi/compare/master...jdotc1:master) to inspect this fork's default branch alongside upstream.
+
+---
+
 [![OpenHub](https://www.openhub.net/p/dcmqi/widgets/project_thin_badge.gif)](https://www.openhub.net/p/dcmqi) [![codecov](https://codecov.io/gh/QIICR/dcmqi/branch/master/graph/badge.svg)](https://codecov.io/gh/QIICR/dcmqi)
 [![PyPI](https://img.shields.io/pypi/v/dcmqi.svg)](https://pypi.org/project/dcmqi/) [![PyPI downloads](https://img.shields.io/pypi/dm/dcmqi.svg)](https://pypi.org/project/dcmqi/) [![](https://img.shields.io/docker/pulls/qiicr/dcmqi.svg?maxAge=604800)](https://hub.docker.com/r/qiicr/dcmqi)
 
