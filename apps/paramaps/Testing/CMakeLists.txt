@@ -164,7 +164,6 @@ dcmqi_add_test(
   COMMAND ${Python3_EXECUTABLE} -B ${CMAKE_SOURCE_DIR}/util/comparejson.py
     ${CMAKE_SOURCE_DIR}/doc/examples/pm-example.json
     ${MODULE_TEMP_DIR}/makeNRRDParametricMap-meta.json
-    "['DerivationDescription', 'DerivedPixelContrast']"
   TEST_DEPENDS
     ${dcm2itk}_makeNRRDParametricMap
   )
@@ -189,7 +188,6 @@ dcmqi_add_test(
   COMMAND ${Python3_EXECUTABLE} -B ${CMAKE_SOURCE_DIR}/util/comparejson.py
     ${CMAKE_SOURCE_DIR}/doc/examples/pm-example-float.json
     ${MODULE_TEMP_DIR}/makeNRRDParametricMapFP-meta.json
-    "['DerivationDescription', 'DerivedPixelContrast']"
   TEST_DEPENDS
     ${dcm2itk}_makeNRRDParametricMapFP
   )

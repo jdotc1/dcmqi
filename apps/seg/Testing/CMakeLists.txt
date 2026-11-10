@@ -445,7 +445,7 @@ dcmqi_add_test(
   dcmqi_add_test(
     NAME ${dcm2itk}_makeNRRD_merged_segment_file_JSON
     MODULE_NAME ${MODULE_NAME}
-    COMMAND python -B ${CMAKE_SOURCE_DIR}/util/comparejson.py
+    COMMAND ${Python3_EXECUTABLE} -B ${CMAKE_SOURCE_DIR}/util/comparejson.py
       ${CMAKE_SOURCE_DIR}/doc/examples/seg-example_multiple_segments_merged.json
       ${MODULE_TEMP_DIR}/makeNRRD_merged_segment_file-meta.json
     TEST_DEPENDS
@@ -492,7 +492,7 @@ dcmqi_add_test(
   dcmqi_add_test(
     NAME ${dcm2itk}_makeNRRD_merged_segment_files_from_partial_overlaps_JSON
     MODULE_NAME ${MODULE_NAME}
-    COMMAND python -B ${CMAKE_SOURCE_DIR}/util/comparejson.py
+    COMMAND ${Python3_EXECUTABLE} -B ${CMAKE_SOURCE_DIR}/util/comparejson.py
       ${CMAKE_SOURCE_DIR}/doc/examples/seg-example_partial_overlaps.json
       ${MODULE_TEMP_DIR}/makeNRRD_merged_segment_files_from_partial_overlaps-meta.json
     TEST_DEPENDS

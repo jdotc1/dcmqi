@@ -148,6 +148,19 @@ jobs:
       run: |
         cd ${{ github.workspace }}/dcmqi-build && ninja
 
+    # Persist a successful cold build before tests/packaging can time out.
+    - name: Save DCMTK, ITK and ZLIB cache
+      if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.cache-dcmtk-itk-zlib.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@v6
+      with:
+        path: |
+          ${{ github.workspace }}/dcmqi-build/DCMTK
+          ${{ github.workspace }}/dcmqi-build/DCMTK-build
+          ${{ github.workspace }}/dcmqi-build/ITK
+          ${{ github.workspace }}/dcmqi-build/ITK-build
+          ${{ github.workspace }}/dcmqi-build/zlib-install
+        key: ${{ steps.cache-dcmtk-itk-zlib.outputs.cache-primary-key }}
+
     # Guard against the silent-skip failure mode: when find_program() fails to locate
     # dciodvfy, CMake drops the conformance tests without failing anything, so the checks
     # stop running unnoticed. Assert they were registered before running the suite.
@@ -186,19 +199,6 @@ jobs:
         name: dcmqi-macos-${{ matrix.arch }}-package
         path: ${{ github.workspace }}/dcmqi-build/dcmqi-build/dcmqi-*-mac*.tar.gz
         overwrite: true
-
-    # Save cache even if a later step (test, package) failed, so deps don't need rebuilding next run
-    - name: Save DCMTK, ITK and ZLIB cache
-      if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.cache-dcmtk-itk-zlib.outputs.cache-hit != 'true' }}
-      uses: actions/cache/save@v6
-      with:
-        path: |
-          ${{ github.workspace }}/dcmqi-build/DCMTK
-          ${{ github.workspace }}/dcmqi-build/DCMTK-build
-          ${{ github.workspace }}/dcmqi-build/ITK
-          ${{ github.workspace }}/dcmqi-build/ITK-build
-          ${{ github.workspace }}/dcmqi-build/zlib-install
-        key: ${{ steps.cache-dcmtk-itk-zlib.outputs.cache-primary-key }}
 
     - name: Publish package
       # Publish tagged (stable) releases only. The rolling "latest" prerelease is

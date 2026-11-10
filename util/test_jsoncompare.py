@@ -71,6 +71,31 @@ class TestJSONCompare(unittest.TestCase):
                 self.assertTrue(compare(
                     expected, actual, ignore_value_of_keys=iter(['ignored']))[0])
 
+    def test_bare_string_ignored_keys_are_rejected(self):
+        for compare in (jsoncompare.are_same, jsoncompare.contains):
+            with self.subTest(compare=compare.__name__):
+                with self.assertRaisesRegex(TypeError, 'iterable of keys'):
+                    compare({'a': 1}, {'a': 1}, ignore_value_of_keys='@schema')
+
+    def test_unhashable_ignored_keys_do_not_crash(self):
+        for compare in (jsoncompare.are_same, jsoncompare.contains):
+            with self.subTest(compare=compare.__name__):
+                self.assertTrue(compare(
+                    {'a': 1, '@schema': 'old'}, {'a': 1},
+                    ignore_value_of_keys=[['not a key'], '@schema'])[0])
+                self.assertFalse(compare(
+                    {'a': 1}, {'a': 2}, ignore_value_of_keys=[['not a key']])[0])
+
+    def test_mixed_type_key_diagnostics_do_not_raise(self):
+        same, stack = jsoncompare.are_same({1: 'a', 'b': 2}, {2: 'a', 'b': 2})
+        self.assertFalse(same)
+        self.assertIn('Missing keys: [1]', str(stack))
+        self.assertIn('Extra keys: [2]', str(stack))
+        same, stack = jsoncompare.are_same({'a': 1}, {2: 1})
+        self.assertFalse(same)
+        self.assertIn("Missing keys: ['a']", str(stack))
+        self.assertIn('Extra keys: [2]', str(stack))
+
     def test_contains_keeps_nested_subset_semantics(self):
         expected = {'a': {'b': 1}, 'values': [1]}
         actual = {'a': {'b': 1, 'c': 2}, 'values': [1, 2], 'extra': 3}

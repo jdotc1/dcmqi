@@ -46,7 +46,29 @@ def _format_value(value):
 
 
 def _generate_pprint_json(value):
-    return json.dumps(value, sort_keys=True, indent=4)
+    try:
+        return json.dumps(value, sort_keys=True, indent=4)
+    except (TypeError, ValueError):
+        # Diagnostics should not raise for valid Python dictionaries with
+        # non-JSON keys (or other values that JSON cannot serialize).
+        return repr(value)
+
+
+def _normalize_ignored_keys(ignore_value_of_keys):
+    if ignore_value_of_keys is None:
+        return set()
+    if isinstance(ignore_value_of_keys, (str, bytes)):
+        raise TypeError('ignore_value_of_keys must be an iterable of keys, not a string')
+
+    ignored = set()
+    for key in ignore_value_of_keys:
+        try:
+            ignored.add(key)
+        except TypeError:
+            # Unhashable values cannot be dictionary keys; they could be
+            # present in the old list-based API without affecting a match.
+            continue
+    return ignored
 
 
 def _is_dict_same(expected, actual, ignore_value_of_keys, ignore_missing_keys):
@@ -123,8 +145,8 @@ def _are_same(expected, actual, ignore_value_of_keys, ignore_missing_keys=False)
             if expected_keys != actual_keys:
                 return False, Stack().append(
                     StackItem('Different keys: Missing keys: {0}; Extra keys: {1}'
-                              .format(sorted(expected_keys - actual_keys),
-                                      sorted(actual_keys - expected_keys)), expected, actual))
+                              .format(sorted(expected_keys - actual_keys, key=repr),
+                                      sorted(actual_keys - expected_keys, key=repr)), expected, actual))
         return _is_dict_same(expected, actual, ignore_value_of_keys,
                              ignore_missing_keys)
 
@@ -141,14 +163,14 @@ def _are_same(expected, actual, ignore_value_of_keys, ignore_missing_keys=False)
 
 
 def are_same(original_a, original_b, ignore_list_order_recursively=False, ignore_missing_keys=False, ignore_value_of_keys=None):
-    ignore_value_of_keys = set(ignore_value_of_keys or ())
+    ignore_value_of_keys = _normalize_ignored_keys(ignore_value_of_keys)
     a = _bottom_up_sort(original_a) if ignore_list_order_recursively else original_a
     b = _bottom_up_sort(original_b) if ignore_list_order_recursively else original_b
     return _are_same(a, b, ignore_value_of_keys, ignore_missing_keys)
 
 
 def contains(expected_original, actual_original, ignore_list_order_recursively=False, ignore_value_of_keys=None):
-    ignore_value_of_keys = set(ignore_value_of_keys or ())
+    ignore_value_of_keys = _normalize_ignored_keys(ignore_value_of_keys)
     actual = _bottom_up_sort(actual_original) if ignore_list_order_recursively else actual_original
     expected = _bottom_up_sort(expected_original) if ignore_list_order_recursively else expected_original
     return _are_same(expected, actual, ignore_value_of_keys, True)
